@@ -115,5 +115,3 @@ function loadData() {
       // ...didn't work, handle it
     });
 }
-
-function createVis() {}

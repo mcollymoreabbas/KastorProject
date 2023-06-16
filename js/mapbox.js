@@ -105,10 +105,6 @@ MapBoxMap.prototype.initVis = function () {
   // which is quicker for the loading of the data
 };
 
-MapBoxMap.prototype.updateVis = function () {
-  // update vis with the time slider
-};
-
 MapBoxMap.prototype.changeYear = function (newYear) {
   var vis = this;
 
