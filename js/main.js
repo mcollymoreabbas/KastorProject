@@ -92,7 +92,7 @@ function loadData() {
 
       allData.push(peopleData);
       allData.push(locationGeoJSON);
-      $.getJSON("data/filteredNYBoundaries.json").then(function (boundaries) {
+      $.getJSON("data/NYBoundaries.json").then(function (boundaries) {
         allData.push(boundaries);
       });
       // leafletMap = new LeafletMap("leaflet-map", allData, [43.2994, -74.21798]);
