@@ -47,23 +47,27 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <link rel="stylesheet" href="./css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="container-fluid">
       <!-- <button type="button" id="leafletButton">Leaflet Map</button>
         <button type="button" id="mapboxButton">MapBox Map</button> -->
-      <div class="slidecontainer">
+      <div class="slidecontainer"><h5>
         <label for="timeSlider">Time Slider: 1789 - 1832</label>
 
         <input
           type="range"
           min="1789"
           max="1832"
-          value="1832"
+          value="1789"
           class="slider"
           id="timeSlider"
         />
-        <h5 id="yearLabel">Current Year: 1789</h5>
+        <h5 id="yearLabel">Current Year: 1789</h5></h5>
       </div>
       <div class="row">
         <div class="col-md-12">
@@ -74,11 +78,11 @@
             <div><strong>Name:</strong> <span id="Name"></span></div>
             <!-- <div><strong>Locality:</strong> <span id="Locality"></span></div> -->
             <div><strong>State:</strong> <span id="State"></span></div>
-            <div><strong>1st Year:</strong> <span id="BuildingYear"></span></div>
+            <div>
+              <strong>1st Year:</strong> <span id="BuildingYear"></span>
+            </div>
             <div><strong>Coordinates:</strong> <span id="Coords"></span></div>
             <div><strong>Personnel:</strong> <span id="Personnel"></span></div>
-
-
           </div>
         </div>
       </div>

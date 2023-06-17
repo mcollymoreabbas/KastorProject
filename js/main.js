@@ -106,7 +106,7 @@ function loadData() {
             "Current Year: " + e.target.value;
           // ok so when e changes, get the value from the slider and then update mapBox
           // mapboxMap.removeMarkers();
-          mapboxMap.addMarkers(e.target.value);
+          // mapboxMap.addMarkers(e.target.value);
           // mapboxMap.plotMarkers(e.target.value);
           // leafletMap.changeYear(e.target.value);
         });
