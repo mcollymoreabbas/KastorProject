@@ -1,34 +1,37 @@
-MapBoxMap = function (_parentElement, _data, _mapPosition) {
+MapBoxMap = function (_parentElement, _data) {
   this.parentElement = _parentElement;
   this.data = _data;
-  this.mapPosition = _mapPosition;
   this.currYear = 1789;
 
-  // data[0] is locationsdata
-  // eventually should get rid of this
-  // data[1] is people
-  // data[2] is locationsgeojson
-  // data [3] is countiesgeojson
+
+  // data[0] is locationsgeojson
+  // data [1] is countiesgeojson
 };
 
 MapBoxMap.prototype.initVis = function () {
   var vis = this;
+
+  const popup = new mapboxgl.Popup({ closeOnClick: false });
+
+  console.log(vis.data);
 
   mapboxgl.accessToken =
     "pk.eyJ1Ijoia2FzdG9ycHJvamVjdCIsImEiOiJjbGlkZ2Q0Z3Ywc2N5M2RwZjVrcnJhMmNvIn0.e1tZnLbd-wfMVODWHJH4ew";
   const map = new mapboxgl.Map({
     container: vis.parentElement, // container ID
     style: "mapbox://styles/mapbox/satellite-v9", // style URL
-    center: vis.mapPosition, // starting position [lng, lat]
+    center: [-75.5, 43], // starting position [lng, lat]
     zoom: 6, // starting zoom
   });
+
+  // non-prototyupe function for loading personnel?
 
   // initial load of the map
   map.on("load", () => {
     // county data
     map.addSource("countyBoundaries", {
       type: "geojson",
-      data: vis.data[3],
+      data: vis.data[1],
       generateId: true,
     });
     map.addLayer({
@@ -36,21 +39,21 @@ MapBoxMap.prototype.initVis = function () {
       source: "countyBoundaries",
       type: "fill",
       paint: {
-        "fill-color": "#3EB489",
+        "fill-color": "#EE4B2B",
         "fill-opacity": 0.3,
         "fill-outline-color": "black",
       },
     });
-    // building data
+    // location data
     map.addSource("locations", {
       type: "geojson",
-      data: vis.data[2],
+      data: vis.data[0],
       generateId: true,
       cluster: true,
       clusterMaxZoom: 7,
       clusterRadius: 40,
     });
-
+    // zoomed out clusters
     map.addLayer({
       id: "clusters",
       type: "circle",
@@ -69,10 +72,9 @@ MapBoxMap.prototype.initVis = function () {
         ],
         "circle-stroke-width": 1,
         "circle-stroke-color": "#000000",
-
       },
     });
-
+    // cluster count label
     map.addLayer({
       id: "cluster-count",
       type: "symbol",
@@ -84,7 +86,7 @@ MapBoxMap.prototype.initVis = function () {
         "text-size": 12,
       },
     });
-
+    // individual location points
     map.addLayer({
       id: "unclustered-point",
       type: "circle",
@@ -121,65 +123,56 @@ MapBoxMap.prototype.initVis = function () {
     //       });
     //     });
     // });
+    //
+
+    map.on("click", "unclustered-point", (e) => {
+      var currData = e.features[0].properties;
+      popup
+        .setLngLat(e.lngLat)
+        .setHTML(
+          "<div id = 'locPopup'><h5>" +
+            currData.name +
+            ", <br>" +
+            "New York</h5>" +
+            "<strong>Built in: " +
+            currData.firstYear +
+            "</strong></div>"
+        )
+        .addTo(map);
+
+      // perhaps populate a scrollable list if there are personnel?
+    });
+    // cursor so that user knows to click
     map.on("mouseenter", "clusters", () => {
       map.getCanvas().style.cursor = "pointer";
     });
     map.on("mouseleave", "clusters", () => {
       map.getCanvas().style.cursor = "";
     });
-    map.on("click", "unclustered-point", (e) => {
-      // // MAJOR EDITING REQUIRED
-      // const coordinates = e.features[0].geometry.coordinates.slice();
-      // const mag = e.features[0].properties.mag;
-      // const tsunami = e.features[0].properties.tsunami === 1 ? "yes" : "no";
+    // html functions to change time
+    document
+      .getElementById("timeSlider")
+      .addEventListener("input", function (e) {
+        document.getElementById("yearLabel").innerHTML =
+          "<strong>Current Year: </strong>" + e.target.value;
+      });
+    document
+      .getElementById("timeSlider")
+      .addEventListener("change", function (e) {
+        var currYear = e.target.value + "-31-12";
 
-      // // Ensure that if the map is zoomed out such that
-      // // multiple copies of the feature are visible, the
-      // // popup appears over the copy being pointed to.
-      // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-      //   coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      // }
+        // ok so i can just <= the dates it seems
+        //  here is where eventually you'll need to change the source data
+        // for the boundaries, you need to sort by end_date
+        // must start befroe and end after t, it can be the first of the year?
+        // extend to 1833 ig
+        // need to adjust the source datas
+        // the
+        // make this function minimal
+        // can do similar editing of the personnel in this sections as well?
+      });
 
-      // new mapboxgl.Popup()
-      //   .setLngLat(coordinates)
-      //   .setHTML(`magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`)
-      //   .addTo(map);
-      // Get the marker's description from the dataset
-      var currData = e.features[0].properties;
-      document.getElementById("Name").innerHTML = currData.name;
-      document.getElementById("State").innerHTML = "New York";
-      document.getElementById("BuildingYear").innerHTML = currData.firstYear;
-      document.getElementById("Coords").innerHTML =
-        "(" +
-        Math.round(10 * e.lngLat["lng"]) / 10 +
-        "," +
-        Math.round(10 * e.lngLat["lat"]) / 10 +
-        ")";
-      document.getElementById("Personnel").innerHTML += "<ul> </ul>";
-      // currData.personnel.forEach(function (d) {
-      //   var personnelList = document.getElementById("personnel");
-      //   var li = document.createElement("li");
-      //   li.appendChild(document.createTextNode(d));
-      //   personnelList.appendChild(li);
-      // });
-
-      // Show a tooltip with the description
-    });
-    // FIGURE OUT HOW TO CLICK OFF THE POINT
-    // map.on("mouseleave", "unclustered-point", function (e) {
-    //   document.getElementById("Name").innerHTML = "";
-    //   document.getElementById("State").innerHTML = "";
-    //   document.getElementById("BuildingYear").innerHTML = "";
-    //   document.getElementById("Coords").innerHTML = "";
-    //   document.getElementById("Personnel").innerHTML = "";
-    // });
+    // CLOSE OF MAPLOAD
   });
-
-  vis.map = map;
-
-  // a lot of mapbox can be entered and edited dynamically without further functions,
-  // which is quicker for the loading of the data
+  // CLOSE OF INITVIS
 };
-
-// COULD POSSIBLE CREATE MORE FUNCTIONS HERE IF NECESSARY
-// PROBS NEED ONE FOR CHANGING THE YEAR

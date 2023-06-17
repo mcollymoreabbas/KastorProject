@@ -1,28 +1,19 @@
 body {
-  font-family: 'Roboto';
+  font-family: "Roboto";
+}
+
+#mapbox-map,
+.sliderContainer {
+  position: absolute;
+  width: 95%;
+  margin: 25px;
 }
 
 #mapbox-map {
-  position: absolute;
-
-  width: 100%;
-  height: 650px;
+  height: 700px;
+  margin-bottom: 90px;
 }
-.slidecontainer {
-  margin: 10px;
-}
-
-#map {
-  top: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-.buildingInfo {
-  position: absolute;
-  font-family: sans-serif;
-  margin-top: 5px;
-  margin-left: 5px;
+.sliderContainer {
   padding: 5px;
   width: 30%;
   border: 2px solid black;
@@ -31,3 +22,9 @@ body {
   background-color: #fff;
   border-radius: 3px;
 }
+
+#locPopup {
+  font-family: "Roboto";
+}
+
+

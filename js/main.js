@@ -4,7 +4,7 @@ var allData = [];
 var leafletMap, mapboxMap;
 // Start application by loading the data
 loadData();
-
+// organize the data load at the VERY END
 function loadData() {
   // Hubway XML station feed
 
@@ -31,6 +31,8 @@ function loadData() {
       // get rid of duplicates at some poitn
 
       lData.forEach(function (d) {
+        // this is the issue, you are using the + which is fro a string ig
+
         temp.push(
           JSON.parse(
             '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [' +
@@ -45,7 +47,10 @@ function loadData() {
               ', "geoID": "' +
               d["Geocoding ID"] +
               '",' +
-              '"personnel":[]' + ',"buildingType": "' + d["Building"]+ '"' +
+              '"personnel":[]' +
+              ',"buildingType": "' +
+              d["Building"] +
+              '"' +
               "}}"
           )
         );
@@ -54,7 +59,7 @@ function loadData() {
       locationGeoJSON = { type: "FeatureCollection", features: temp };
 
       // console.log(locationGeoJSON);
-      allData.push(lData);
+      // allData.push(lData);
     })
     .fail(function () {
       // ...didn't work, handle it
@@ -90,26 +95,14 @@ function loadData() {
         });
       });
 
-      allData.push(peopleData);
+      // allData.push(peopleData);
       allData.push(locationGeoJSON);
       $.getJSON("./data/NYBoundaries.json").then(function (boundaries) {
         allData.push(boundaries);
       });
       // leafletMap = new LeafletMap("leaflet-map", allData, [43.2994, -74.21798]);
-      mapboxMap = new MapBoxMap("mapbox-map", allData, [-75.5, 43]);
+      mapboxMap = new MapBoxMap("mapbox-map", allData);
       mapboxMap.initVis();
-
-      document
-        .getElementById("timeSlider")
-        .addEventListener("change", function (e) {
-          document.getElementById("yearLabel").innerText =
-            "Current Year: " + e.target.value;
-          // ok so when e changes, get the value from the slider and then update mapBox
-          // mapboxMap.removeMarkers();
-          // mapboxMap.addMarkers(e.target.value);
-          // mapboxMap.plotMarkers(e.target.value);
-          // leafletMap.changeYear(e.target.value);
-        });
     })
     .fail(function () {
       // ...didn't work, handle it

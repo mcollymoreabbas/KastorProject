@@ -44,7 +44,7 @@
       integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
       crossorigin="anonymous"
     ></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
 
     <link rel="stylesheet" href="./css/style.css" />
     <link
@@ -53,10 +53,9 @@
     />
   </head>
   <body>
-    <div class="container-fluid">
-      <!-- <button type="button" id="leafletButton">Leaflet Map</button>
-        <button type="button" id="mapboxButton">MapBox Map</button> -->
-      <div class="slidecontainer"><h5>
+    <div id="mapbox-map"></div>
+    <div class="sliderContainer">
+      <h5>
         <label for="timeSlider">Time Slider: 1789 - 1832</label>
 
         <input
@@ -67,25 +66,8 @@
           class="slider"
           id="timeSlider"
         />
-        <h5 id="yearLabel">Current Year: 1789</h5></h5>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <!-- Visualization placeholders -->
-          <!-- <div id="leaflet-map"></div> -->
-          <div id="mapbox-map"></div>
-          <div class="buildingInfo">
-            <div><strong>Name:</strong> <span id="Name"></span></div>
-            <!-- <div><strong>Locality:</strong> <span id="Locality"></span></div> -->
-            <div><strong>State:</strong> <span id="State"></span></div>
-            <div>
-              <strong>1st Year:</strong> <span id="BuildingYear"></span>
-            </div>
-            <div><strong>Coordinates:</strong> <span id="Coords"></span></div>
-            <div><strong>Personnel:</strong> <span id="Personnel"></span></div>
-          </div>
-        </div>
-      </div>
+        <h5 id="yearLabel"><strong>Current Year:</strong> 1789</h5>
+      </h5>
     </div>
 
     <!-- Load JS libraries -->
