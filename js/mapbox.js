@@ -29,6 +29,8 @@ MapBoxMap.prototype.initVis = function () {
   // initial load of the map
   map.on("load", () => {
     // county data
+    // FILTER COUNTY DATA ON LOAD?
+    // upload geojson to url?
     map.addSource("countyBoundaries", {
       type: "geojson",
       data: vis.data[1],
