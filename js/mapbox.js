@@ -133,14 +133,14 @@ MapBoxMap.prototype.initVis = function () {
         (error, features) => {
           // Print cluster leaves in the console
           console.log("Cluster leaves:", error, features);
-          var clusterString = "";
+          var clusterString = "<h5>Cities in Cluster: </h5>";
           if (features) {
             features.forEach(function (point) {
               clusterString =
                 clusterString +
-                "<br> <strong>" +
+                "<strong>" +
                 point.properties["name"] +
-                "</strong>";
+                "</strong> <br> ";
             });
           }
           document.getElementById("displayList").innerHTML = clusterString;
