@@ -1,7 +1,6 @@
 MapBoxMap = function (_parentElement, _data) {
   this.parentElement = _parentElement;
   this.data = _data;
-  this.currYear = 1789;
 
   // data[0] is locationsgeojson
   // data [1] is countiesgeojson
@@ -28,9 +27,28 @@ MapBoxMap.prototype.initVis = function () {
     // county data
     // FILTER COUNTY DATA ON LOAD?
     // upload geojson to url?
+
+    var originalCountyData = {
+      ...vis.data[1], // Spread the existing object properties
+      features: vis.data[1].features.filter(function (d) {
+        // console.log(d, d["START_DATE"])
+        var sDate = new Date(d.properties["START_DATE"]);
+        var eDate = new Date(d.properties["END_DATE"]);
+        var currDate = new Date("1789-01-01");
+        var bool = sDate < currDate && eDate > currDate;
+        return bool;
+      }), // Filter the array based on a condition
+    };
+    var originalLocData = {
+      ...vis.data[0],
+      features:vis.data[0].features.filter(function(d){
+        return (d.properties.firstYear<= 1789)
+      })
+    };
+
     map.addSource("countyBoundaries", {
       type: "geojson",
-      data: vis.data[1],
+      data: originalCountyData,
       generateId: true,
     });
     map.addLayer({
@@ -43,10 +61,19 @@ MapBoxMap.prototype.initVis = function () {
         "fill-outline-color": "black",
       },
     });
+
+    map.addLayer({
+      id: "countyOutline",
+      source: "countyBoundaries",
+      type: "line",
+      paint: {
+        "line-width": 4,
+      },
+    });
     // location data
     map.addSource("locations", {
       type: "geojson",
-      data: vis.data[0],
+      data: originalLocData,
       generateId: true,
       cluster: true,
       clusterMaxZoom: 7,
@@ -122,7 +149,6 @@ MapBoxMap.prototype.initVis = function () {
       });
 
       const clusterId = features[0].properties.cluster_id;
-      console.log(e, features[0]);
       const pointCount = features[0].properties.point_count;
       const clusterSource = map.getSource("locations");
 
@@ -132,7 +158,6 @@ MapBoxMap.prototype.initVis = function () {
         0,
         (error, features) => {
           // Print cluster leaves in the console
-          console.log("Cluster leaves:", error, features);
           var clusterString = "<h5>Cities in Cluster: </h5>";
           if (features) {
             features.forEach(function (point) {
@@ -173,7 +198,6 @@ MapBoxMap.prototype.initVis = function () {
 
     map.on("click", "unclustered-point", (e) => {
       var currData = e.features[0].properties;
-      console.log(currData);
       document.getElementById("clickedPanel").setAttribute("display", "none");
       // var displayString = "<strong>Personnel: </strong> <br>";
       // if (currData.personnel.length > 0) {
@@ -214,7 +238,30 @@ MapBoxMap.prototype.initVis = function () {
     document
       .getElementById("timeSlider")
       .addEventListener("change", function (e) {
-        var currYear = e.target.value + "-31-12";
+        var sliderYear = e.target.value + "-01-01";
+        var locationData = vis.data[0];
+
+        var newCountyData = {
+          ...vis.data[1], // Spread the existing object properties
+          features: vis.data[1].features.filter(function (d) {
+            // console.log(d, d["START_DATE"])
+            var sDate = new Date(d.properties["START_DATE"]);
+            var eDate = new Date(d.properties["END_DATE"]);
+            var currDate = new Date(sliderYear);
+            var bool = sDate < currDate && eDate > currDate;
+            return bool;
+          }), // Filter the array based on a condition
+        };
+
+        var newLocData = {
+          ...vis.data[0],
+          features:vis.data[0].features.filter(function(d){
+            return (d.properties.firstYear<= e.target.value)
+          })
+        };
+        map.getSource("countyBoundaries").setData(newCountyData);
+        map.getSource("locations").setData(newLocData);
+
 
         // ok so i can just <= the dates it seems
         //  here is where eventually you'll need to change the source data
