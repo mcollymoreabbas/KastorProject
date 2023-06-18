@@ -3,28 +3,28 @@ body {
 }
 
 #mapbox-map,
-.sliderContainer {
-  position: absolute;
-  width: 95%;
+.infoContainer {
   margin: 25px;
-}
-
-#mapbox-map {
-  height: 700px;
-  margin-bottom: 90px;
-}
-.sliderContainer {
-  padding: 5px;
-  width: 30%;
   border: 2px solid black;
-  font-size: 14px;
   color: #222;
   background-color: #fff;
   border-radius: 3px;
+  padding: 5px;
+  position: relative;
+}
+
+#mapbox-map {
+  position: absolute;
+  height: 700px;
+  width: 95%;
+  margin-bottom: 90px;
+  z-index: -10;
+}
+.infoContainer {
+  position: absolute;
+  width: 30%;
 }
 
 #locPopup {
   font-family: "Roboto";
 }
-
-

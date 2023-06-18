@@ -3,7 +3,6 @@ MapBoxMap = function (_parentElement, _data) {
   this.data = _data;
   this.currYear = 1789;
 
-
   // data[0] is locationsgeojson
   // data [1] is countiesgeojson
 };
@@ -12,8 +11,6 @@ MapBoxMap.prototype.initVis = function () {
   var vis = this;
 
   const popup = new mapboxgl.Popup({ closeOnClick: false });
-
-  // console.log(vis.data);
 
   mapboxgl.accessToken =
     "pk.eyJ1Ijoia2FzdG9ycHJvamVjdCIsImEiOiJjbGlkZ2Q0Z3Ywc2N5M2RwZjVrcnJhMmNvIn0.e1tZnLbd-wfMVODWHJH4ew";
@@ -72,8 +69,18 @@ MapBoxMap.prototype.initVis = function () {
           8,
           "#375360",
         ],
-        "circle-stroke-width": 1,
-        "circle-stroke-color": "#000000",
+        "circle-stroke-width": [
+          "case",
+          ["boolean", ["feature-state", "clicked"], false],
+          3,
+          1,
+        ],
+        "circle-stroke-color": [
+          "case",
+          ["boolean", ["feature-state", "clicked"], false],
+          "#FFFFFF",
+          "#000000",
+        ],
       },
     });
     // cluster count label
@@ -105,6 +112,7 @@ MapBoxMap.prototype.initVis = function () {
     // map.on("mouseenter", "clusters", function (e, item) {
     //   console.log(e, item);
     // });
+    var locID = null;
 
     map.on("click", "clusters", (e) => {
       // TODO: FIX BUG WITH THIS CODE
@@ -115,21 +123,64 @@ MapBoxMap.prototype.initVis = function () {
 
       const clusterId = features[0].properties.cluster_id;
       console.log(e, features[0]);
-      // map
-      //   .getSource("locations")
-      //   .getClusterExpansionZoom(clusterId, (err, zoom) => {
-      //     if (err) return;
+      const pointCount = features[0].properties.point_count;
+      const clusterSource = map.getSource("locations");
 
-      //     map.easeTo({
-      //       center: e.lngLat,
-      //       zoom: zoom,
-      //     });
-      //   });
+      clusterSource.getClusterLeaves(
+        clusterId,
+        pointCount,
+        0,
+        (error, features) => {
+          // Print cluster leaves in the console
+          console.log("Cluster leaves:", error, features);
+          var clusterString = "";
+          if (features) {
+            features.forEach(function (point) {
+              clusterString =
+                clusterString +
+                "<br> <strong>" +
+                point.properties["name"] +
+                "</strong>";
+            });
+          }
+          document.getElementById("displayList").innerHTML = clusterString;
+        }
+      );
+
+      if (e.features.length === 0) return;
+
+      document.getElementById("clickedPanel").setAttribute("display", "block");
+
+      if (locID) {
+        map.removeFeatureState({
+          source: "locations",
+          id: locID,
+        });
+      }
+
+      locID = e.features[0].id;
+
+      map.setFeatureState(
+        {
+          source: "locations",
+          id: locID,
+        },
+        {
+          clicked: true,
+        }
+      );
     });
-    
 
     map.on("click", "unclustered-point", (e) => {
       var currData = e.features[0].properties;
+      console.log(currData);
+      document.getElementById("clickedPanel").setAttribute("display", "none");
+      // var displayString = "<strong>Personnel: </strong> <br>";
+      // if (currData.personnel.length > 0) {
+      //   currData.personnel.forEach(function (p) {
+      //     displayString = displayString + "<a>" + p["Full Name"] + "</a> <br>";
+      //   });
+      // }
       popup
         .setLngLat(e.lngLat)
         .setHTML(
@@ -142,6 +193,7 @@ MapBoxMap.prototype.initVis = function () {
             "</strong></div>"
         )
         .addTo(map);
+      document.getElementById("displayList").innerHTML = displayString;
 
       // perhaps populate a scrollable list if there are personnel?
     });
@@ -174,8 +226,10 @@ MapBoxMap.prototype.initVis = function () {
         // make this function minimal
         // can do similar editing of the personnel in this sections as well?
       });
+    console.log(vis.data);
 
     // CLOSE OF MAPLOAD
   });
+
   // CLOSE OF INITVIS
 };

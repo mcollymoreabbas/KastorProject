@@ -19,7 +19,6 @@ function loadData() {
   // TO-DO: LOAD DATA
 
   //use data
-  //  console.log(data)
   $.when(
     $.getJSON(locationUrl),
     $.getJSON(peopleUrl),
@@ -29,7 +28,6 @@ function loadData() {
       lData = lData[0];
       pData = pData[0];
       boundaries = boundaries[0];
-      console.log(lData, pData, boundaries);
 
       // ...worked, put it in #view-graphic
       lData = lData["Data"];
@@ -54,9 +52,8 @@ function loadData() {
               d["First Year"] +
               ', "geoID": "' +
               d["Geocoding ID"] +
-              '",' +
-              '"personnel":[]' +
-              ',"buildingType": "' +
+              '", ' +
+              '"buildingType": "' +
               d["Building"] +
               '"' +
               "}}"
@@ -71,7 +68,6 @@ function loadData() {
       peopleFields.push("Geocoding ID");
 
       pData["Data"].map((item) => {
-        // console.log(item)
         const filteredItem = {};
         peopleFields.forEach((field) => {
           if (item.hasOwnProperty(field)) {
@@ -86,8 +82,9 @@ function loadData() {
       });
       // issue with the personnel popping up right now
 
-      peopleData.forEach(function (p) {
-        locationGeoJSON["features"].forEach(function (t) {
+      locationGeoJSON["features"].forEach(function (t) {
+        t.properties["personnel"] = [];
+        peopleData.forEach(function (p) {
           if (p["Geocoding ID"] == t.properties.geoID) {
             t.properties["personnel"].push(p);
           }
@@ -96,15 +93,11 @@ function loadData() {
 
       allData.push(locationGeoJSON);
       allData.push(boundaries);
-      
       mapboxMap = new MapBoxMap("mapbox-map", allData);
       mapboxMap.initVis();
     })
 
-
     .fail(function () {
       // ...didn't work, handle it
     });
-
-  
 }
