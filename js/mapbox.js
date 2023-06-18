@@ -27,23 +27,22 @@ MapBoxMap.prototype.initVis = function () {
     // county data
     // FILTER COUNTY DATA ON LOAD?
     // upload geojson to url?
-
     var originalCountyData = {
       ...vis.data[1], // Spread the existing object properties
       features: vis.data[1].features.filter(function (d) {
         // console.log(d, d["START_DATE"])
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
-        var currDate = new Date("1789-01-01");
+        var currDate = new Date("1832-01-01");
         var bool = sDate < currDate && eDate > currDate;
         return bool;
       }), // Filter the array based on a condition
     };
     var originalLocData = {
       ...vis.data[0],
-      features:vis.data[0].features.filter(function(d){
-        return (d.properties.firstYear<= 1789)
-      })
+      features: vis.data[0].features.filter(function (d) {
+        return d.properties.firstYear <= 1832;
+      }),
     };
 
     map.addSource("countyBoundaries", {
@@ -158,8 +157,9 @@ MapBoxMap.prototype.initVis = function () {
         0,
         (error, features) => {
           // Print cluster leaves in the console
-          var clusterString = "<h5>Cities in Cluster: </h5>";
+          var clusterString = "";
           if (features) {
+            clusterString = clusterString + "<h5>Cities in Cluster: </h5>";
             features.forEach(function (point) {
               clusterString =
                 clusterString +
@@ -198,6 +198,7 @@ MapBoxMap.prototype.initVis = function () {
 
     map.on("click", "unclustered-point", (e) => {
       var currData = e.features[0].properties;
+      document.getElementById("displayList").innerHTML = "";
       document.getElementById("clickedPanel").setAttribute("display", "none");
       // var displayString = "<strong>Personnel: </strong> <br>";
       // if (currData.personnel.length > 0) {
@@ -217,7 +218,7 @@ MapBoxMap.prototype.initVis = function () {
             "</strong></div>"
         )
         .addTo(map);
-      document.getElementById("displayList").innerHTML = displayString;
+      // document.getElementById("displayList").innerHTML = displayString;
 
       // perhaps populate a scrollable list if there are personnel?
     });
@@ -241,6 +242,8 @@ MapBoxMap.prototype.initVis = function () {
         var sliderYear = e.target.value + "-01-01";
         var locationData = vis.data[0];
 
+// county data glitch at 1826, missing spot
+
         var newCountyData = {
           ...vis.data[1], // Spread the existing object properties
           features: vis.data[1].features.filter(function (d) {
@@ -255,13 +258,12 @@ MapBoxMap.prototype.initVis = function () {
 
         var newLocData = {
           ...vis.data[0],
-          features:vis.data[0].features.filter(function(d){
-            return (d.properties.firstYear<= e.target.value)
-          })
+          features: vis.data[0].features.filter(function (d) {
+            return d.properties.firstYear <= e.target.value;
+          }),
         };
         map.getSource("countyBoundaries").setData(newCountyData);
         map.getSource("locations").setData(newLocData);
-
 
         // ok so i can just <= the dates it seems
         //  here is where eventually you'll need to change the source data
