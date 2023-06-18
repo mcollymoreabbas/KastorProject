@@ -13,7 +13,7 @@ MapBoxMap.prototype.initVis = function () {
 
   const popup = new mapboxgl.Popup({ closeOnClick: false });
 
-  console.log(vis.data);
+  // console.log(vis.data);
 
   mapboxgl.accessToken =
     "pk.eyJ1Ijoia2FzdG9ycHJvamVjdCIsImEiOiJjbGlkZ2Q0Z3Ywc2N5M2RwZjVrcnJhMmNvIn0.e1tZnLbd-wfMVODWHJH4ew";
@@ -106,26 +106,27 @@ MapBoxMap.prototype.initVis = function () {
     //   console.log(e, item);
     // });
 
-    // map.on("click", "clusters", (e) => {
-    //   // TODO: FIX BUG WITH THIS CODE
-    //   const features = map.queryRenderedFeatures(e.point, {
-    //     layers: ["clusters"],
-    //   });
+    map.on("click", "clusters", (e) => {
+      // TODO: FIX BUG WITH THIS CODE
+      // maybe this one can just create a popup that'll have a UL
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: ["clusters"],
+      });
 
-    //   const clusterId = features[0].properties.cluster_id;
-    //   console.log(e, features[0]);
-    //   map
-    //     .getSource("locations")
-    //     .getClusterExpansionZoom(clusterId, (err, zoom) => {
-    //       if (err) return;
+      const clusterId = features[0].properties.cluster_id;
+      console.log(e, features[0]);
+      // map
+      //   .getSource("locations")
+      //   .getClusterExpansionZoom(clusterId, (err, zoom) => {
+      //     if (err) return;
 
-    //       map.easeTo({
-    //         center: e.lngLat,
-    //         zoom: zoom,
-    //       });
-    //     });
-    // });
-    //
+      //     map.easeTo({
+      //       center: e.lngLat,
+      //       zoom: zoom,
+      //     });
+      //   });
+    });
+    
 
     map.on("click", "unclustered-point", (e) => {
       var currData = e.features[0].properties;

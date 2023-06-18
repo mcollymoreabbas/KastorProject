@@ -20,11 +20,19 @@ function loadData() {
 
   //use data
   //  console.log(data)
+  $.when(
+    $.getJSON(locationUrl),
+    $.getJSON(peopleUrl),
+    $.getJSON("./data/NYBoundaries.json")
+  )
+    .then(function (lData, pData, boundaries) {
+      lData = lData[0];
+      pData = pData[0];
+      boundaries = boundaries[0];
+      console.log(lData, pData, boundaries);
 
-  $.getJSON(locationUrl)
-    .then(function (lData) {
       // ...worked, put it in #view-graphic
-      lData = lData.Data;
+      lData = lData["Data"];
       lData.sort(function (a, b) {
         return a["First Year"] - b["First Year"];
       });
@@ -55,23 +63,14 @@ function loadData() {
           )
         );
       });
-
       locationGeoJSON = { type: "FeatureCollection", features: temp };
 
-      // console.log(locationGeoJSON);
-      // allData.push(lData);
-    })
-    .fail(function () {
-      // ...didn't work, handle it
-    });
-  $.getJSON(peopleUrl)
-    .then(function (pData) {
-      pData.Fields.forEach((element) => {
+      pData["Fields"].forEach((element) => {
         peopleFields.push(element["Fied"]);
       });
       peopleFields.push("Geocoding ID");
 
-      pData.Data.map((item) => {
+      pData["Data"].map((item) => {
         // console.log(item)
         const filteredItem = {};
         peopleFields.forEach((field) => {
@@ -95,16 +94,17 @@ function loadData() {
         });
       });
 
-      // allData.push(peopleData);
       allData.push(locationGeoJSON);
-      $.getJSON("./data/NYBoundaries.json").then(function (boundaries) {
-        allData.push(boundaries);
-      });
-      // leafletMap = new LeafletMap("leaflet-map", allData, [43.2994, -74.21798]);
+      allData.push(boundaries);
+      
       mapboxMap = new MapBoxMap("mapbox-map", allData);
       mapboxMap.initVis();
     })
+
+
     .fail(function () {
       // ...didn't work, handle it
     });
+
+  
 }
