@@ -265,15 +265,6 @@ MapBoxMap.prototype.initVis = function () {
         map.getSource("countyBoundaries").setData(newCountyData);
         map.getSource("locations").setData(newLocData);
 
-        // ok so i can just <= the dates it seems
-        //  here is where eventually you'll need to change the source data
-        // for the boundaries, you need to sort by end_date
-        // must start befroe and end after t, it can be the first of the year?
-        // extend to 1833 ig
-        // need to adjust the source datas
-        // the
-        // make this function minimal
-        // can do similar editing of the personnel in this sections as well?
       });
     console.log(vis.data);
 
