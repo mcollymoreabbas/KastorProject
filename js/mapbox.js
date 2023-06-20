@@ -240,9 +240,8 @@ MapBoxMap.prototype.initVis = function () {
       .getElementById("timeSlider")
       .addEventListener("change", function (e) {
         var sliderYear = e.target.value + "-01-01";
-        var locationData = vis.data[0];
 
-// county data glitch at 1826, missing spot
+        // county data glitch at 1826, missing spot
 
         var newCountyData = {
           ...vis.data[1], // Spread the existing object properties
@@ -264,8 +263,7 @@ MapBoxMap.prototype.initVis = function () {
         };
         map.getSource("countyBoundaries").setData(newCountyData);
         map.getSource("locations").setData(newLocData);
-
-      });
+ s      });
     console.log(vis.data);
 
     // CLOSE OF MAPLOAD
