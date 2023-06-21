@@ -32,7 +32,7 @@ MapBoxMap.prototype.initVis = function () {
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
         var currDate = new Date("1832-12-31");
-        var bool = sDate < currDate && eDate > currDate;
+        var bool = sDate <= currDate && eDate > currDate;
         return bool;
       }), // Filter the array based on a condition
     };
@@ -50,7 +50,7 @@ MapBoxMap.prototype.initVis = function () {
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
         var currDate = new Date("1832-12-31");
-        var bool = sDate < currDate && eDate > currDate;
+        var bool = sDate <= currDate && eDate > currDate;
         return bool;
       }), // Filter the array based on a condition
     };
@@ -81,16 +81,16 @@ console.log(vis.data)
 
     // COUNTY LAYER
     
-    // map.addLayer({
-    //   id: "counties",
-    //   source: "countyBoundaries",
-    //   type: "fill",
-    //   paint: {
-    //     "fill-color": "#EE4B2B",
-    //     "fill-opacity": 0.3,
-    //     "fill-outline-color": "white",
-    //   },
-    // });
+    map.addLayer({
+      id: "counties",
+      source: "countyBoundaries",
+      type: "fill",
+      paint: {
+        "fill-color": "#EE4B2B",
+        "fill-opacity": 0,
+        "fill-outline-color": "white",
+      },
+    });
 
     map.addLayer({
       id: "countyOutline",
@@ -266,6 +266,20 @@ console.log(vis.data)
 
       // perhaps populate a scrollable list if there are personnel?
     });
+
+    map.on("click", "counties", (county) =>{
+      // console.log(county.features[0])
+      var currData = county.features[0].properties;
+      popup
+        .setLngLat(county.lngLat)
+        .setHTML(
+          "<div id = 'locPopup'><h5>" +
+            currData["NAME"] +
+            ", <br>" +  currData['STATE_TERR'] +
+            "</h5></div>" 
+        )
+        .addTo(map);
+    })
     // cursor so that user knows to click
     map.on("mouseenter", "clusters", () => {
       map.getCanvas().style.cursor = "pointer";
@@ -294,7 +308,7 @@ console.log(vis.data)
             var sDate = new Date(d.properties["START_DATE"]);
             var eDate = new Date(d.properties["END_DATE"]);
             var currDate = new Date(sliderYear);
-            var bool = sDate < currDate && eDate > currDate;
+            var bool = sDate <= currDate && eDate > currDate;
             return bool;
           }), // Filter the array based on a condition
         };
@@ -305,7 +319,7 @@ console.log(vis.data)
             var sDate = new Date(d.properties["START_DATE"]);
             var eDate = new Date(d.properties["END_DATE"]);
             var currDate = new Date(sliderYear);
-            var bool = sDate < currDate && eDate > currDate;
+            var bool = sDate <= currDate && eDate > currDate;
             return bool;
           }), // Filter the array based on a condition
         };
