@@ -25,15 +25,13 @@ MapBoxMap.prototype.initVis = function () {
   // initial load of the map
   map.on("load", () => {
     // county data
-    // FILTER COUNTY DATA ON LOAD?
-    // upload geojson to url?
     var originalCountyData = {
       ...vis.data[1], // Spread the existing object properties
       features: vis.data[1].features.filter(function (d) {
         // console.log(d, d["START_DATE"])
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
-        var currDate = new Date("1832-01-01");
+        var currDate = new Date("1832-12-31");
         var bool = sDate < currDate && eDate > currDate;
         return bool;
       }), // Filter the array based on a condition
@@ -45,14 +43,68 @@ MapBoxMap.prototype.initVis = function () {
       }),
     };
 
+    var originalStateData = {
+      ...vis.data[2], // Spread the existing object properties
+      features: vis.data[2].features.filter(function (d) {
+        // console.log(d, d["START_DATE"])
+        var sDate = new Date(d.properties["START_DATE"]);
+        var eDate = new Date(d.properties["END_DATE"]);
+        var currDate = new Date("1832-12-31");
+        var bool = sDate < currDate && eDate > currDate;
+        return bool;
+      }), // Filter the array based on a condition
+    };
+console.log(vis.data)
+    // BOUNDARY SOURCE DATA
     map.addSource("countyBoundaries", {
       type: "geojson",
       data: originalCountyData,
       generateId: true,
     });
+
+    map.addSource("stateBoundaries",
+      {
+        type: "geojson",
+        data: originalStateData,
+        generateId: true,
+      });
+
+    // LOCATION SOURCE DATA
+    map.addSource("locations", {
+      type: "geojson",
+      data: originalLocData,
+      generateId: true,
+      cluster: true,
+      clusterMaxZoom: 7,
+      clusterRadius: 40,
+    });
+
+    // COUNTY LAYER
+    
+    // map.addLayer({
+    //   id: "counties",
+    //   source: "countyBoundaries",
+    //   type: "fill",
+    //   paint: {
+    //     "fill-color": "#EE4B2B",
+    //     "fill-opacity": 0.3,
+    //     "fill-outline-color": "white",
+    //   },
+    // });
+
     map.addLayer({
-      id: "counties",
+      id: "countyOutline",
       source: "countyBoundaries",
+      type: "line",
+      paint: {
+        "line-width": 2,
+        "line-color": "white",
+      },
+    });
+
+    map.addLayer({
+      id: "states",
+      source: "stateBoundaries",
       type: "fill",
       paint: {
         "fill-color": "#EE4B2B",
@@ -62,22 +114,14 @@ MapBoxMap.prototype.initVis = function () {
     });
 
     map.addLayer({
-      id: "countyOutline",
-      source: "countyBoundaries",
+      id: "stateOutline",
+      source: "stateBoundaries",
       type: "line",
       paint: {
         "line-width": 4,
       },
     });
-    // location data
-    map.addSource("locations", {
-      type: "geojson",
-      data: originalLocData,
-      generateId: true,
-      cluster: true,
-      clusterMaxZoom: 7,
-      clusterRadius: 40,
-    });
+
     // zoomed out clusters
     map.addLayer({
       id: "clusters",
@@ -239,13 +283,24 @@ MapBoxMap.prototype.initVis = function () {
     document
       .getElementById("timeSlider")
       .addEventListener("change", function (e) {
-        var sliderYear = e.target.value + "-01-01";
+        var sliderYear = e.target.value + "-12-31";
 
         // county data glitch at 1826, missing spot
 
         var newCountyData = {
           ...vis.data[1], // Spread the existing object properties
           features: vis.data[1].features.filter(function (d) {
+            // console.log(d, d["START_DATE"])
+            var sDate = new Date(d.properties["START_DATE"]);
+            var eDate = new Date(d.properties["END_DATE"]);
+            var currDate = new Date(sliderYear);
+            var bool = sDate < currDate && eDate > currDate;
+            return bool;
+          }), // Filter the array based on a condition
+        };
+        var newStateData = {
+          ...vis.data[2], // Spread the existing object properties
+          features: vis.data[2].features.filter(function (d) {
             // console.log(d, d["START_DATE"])
             var sDate = new Date(d.properties["START_DATE"]);
             var eDate = new Date(d.properties["END_DATE"]);
@@ -263,7 +318,8 @@ MapBoxMap.prototype.initVis = function () {
         };
         map.getSource("countyBoundaries").setData(newCountyData);
         map.getSource("locations").setData(newLocData);
- s      });
+        map.getSource("stateBoundaries").setData(newStateData);
+      });
     console.log(vis.data);
 
     // CLOSE OF MAPLOAD

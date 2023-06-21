@@ -22,12 +22,14 @@ function loadData() {
   $.when(
     $.getJSON(locationUrl),
     $.getJSON(peopleUrl),
-    $.getJSON("./data/NYBoundaries.json")
+    $.getJSON("./data/CountyBoundaries.json"),
+    $.getJSON("./data/StateBoundaries.json")
   )
-    .then(function (lData, pData, boundaries) {
+    .then(function (lData, pData, countyBoundaries, stateBoundaries) {
       lData = lData[0];
       pData = pData[0];
-      boundaries = boundaries[0];
+      countyBoundaries = countyBoundaries[0];
+      stateBoundaries = stateBoundaries[0];
 
       // ...worked, put it in #view-graphic
       lData = lData["Data"];
@@ -92,7 +94,8 @@ function loadData() {
       });
 
       allData.push(locationGeoJSON);
-      allData.push(boundaries);
+      allData.push(countyBoundaries);
+      allData.push(stateBoundaries);
       mapboxMap = new MapBoxMap("mapbox-map", allData);
       mapboxMap.initVis();
     })
