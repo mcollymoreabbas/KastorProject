@@ -32,7 +32,7 @@ MapBoxMap.prototype.initVis = function () {
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
         var currDate = new Date("1832-12-31");
-        var bool = sDate <= currDate && eDate > currDate;
+        var bool = sDate < currDate && eDate >= currDate;
         return bool;
       }), // Filter the array based on a condition
     };
@@ -50,11 +50,10 @@ MapBoxMap.prototype.initVis = function () {
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
         var currDate = new Date("1832-12-31");
-        var bool = sDate <= currDate && eDate > currDate;
+        var bool = sDate < currDate && eDate >= currDate;
         return bool;
       }), // Filter the array based on a condition
     };
-console.log(vis.data)
     // BOUNDARY SOURCE DATA
     map.addSource("countyBoundaries", {
       type: "geojson",
@@ -87,7 +86,7 @@ console.log(vis.data)
       type: "fill",
       paint: {
         "fill-color": "#EE4B2B",
-        "fill-opacity": 0,
+        "fill-opacity": 0.3,
         "fill-outline-color": "white",
       },
     });
@@ -102,16 +101,16 @@ console.log(vis.data)
       },
     });
 
-    map.addLayer({
-      id: "states",
-      source: "stateBoundaries",
-      type: "fill",
-      paint: {
-        "fill-color": "#EE4B2B",
-        "fill-opacity": 0.3,
-        "fill-outline-color": "black",
-      },
-    });
+    // map.addLayer({
+    //   id: "states",
+    //   source: "stateBoundaries",
+    //   type: "fill",
+    //   paint: {
+    //     "fill-color": "#EE4B2B",
+    //     "fill-opacity": 0.3,
+    //     "fill-outline-color": "black",
+    //   },
+    // });
 
     map.addLayer({
       id: "stateOutline",
@@ -308,7 +307,7 @@ console.log(vis.data)
             var sDate = new Date(d.properties["START_DATE"]);
             var eDate = new Date(d.properties["END_DATE"]);
             var currDate = new Date(sliderYear);
-            var bool = sDate <= currDate && eDate > currDate;
+            var bool = sDate < currDate && eDate >= currDate;
             return bool;
           }), // Filter the array based on a condition
         };
@@ -319,7 +318,7 @@ console.log(vis.data)
             var sDate = new Date(d.properties["START_DATE"]);
             var eDate = new Date(d.properties["END_DATE"]);
             var currDate = new Date(sliderYear);
-            var bool = sDate <= currDate && eDate > currDate;
+            var bool = sDate < currDate && eDate >= currDate;
             return bool;
           }), // Filter the array based on a condition
         };
