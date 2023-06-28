@@ -2,8 +2,9 @@ MapBoxMap = function (_parentElement, _data) {
   this.parentElement = _parentElement;
   this.data = _data;
 
-  // data[0] is locationsgeojson
-  // data [1] is countiesgeojson
+  // data[0] is locationsgeoJSON
+  // data [1] is countyBoundariesgeoJSON
+  //data [2] is stateBoundariesgeoJSON
 };
 
 MapBoxMap.prototype.initVis = function () {
@@ -61,12 +62,11 @@ MapBoxMap.prototype.initVis = function () {
       generateId: true,
     });
 
-    map.addSource("stateBoundaries",
-      {
-        type: "geojson",
-        data: originalStateData,
-        generateId: true,
-      });
+    map.addSource("stateBoundaries", {
+      type: "geojson",
+      data: originalStateData,
+      generateId: true,
+    });
 
     // LOCATION SOURCE DATA
     map.addSource("locations", {
@@ -79,7 +79,7 @@ MapBoxMap.prototype.initVis = function () {
     });
 
     // COUNTY LAYER
-    
+
     map.addLayer({
       id: "counties",
       source: "countyBoundaries",
@@ -266,19 +266,16 @@ MapBoxMap.prototype.initVis = function () {
       // perhaps populate a scrollable list if there are personnel?
     });
 
-    map.on("click", "counties", (county) =>{
-      // console.log(county.features[0])
+    map.on("mousemove", "counties", (county) => {
       var currData = county.features[0].properties;
-      popup
-        .setLngLat(county.lngLat)
-        .setHTML(
-          "<div id = 'locPopup'><h5>" +
-            currData["NAME"] +
-            ", <br>" +  currData['STATE_TERR'] +
-            "</h5></div>" 
-        )
-        .addTo(map);
-    })
+
+      document.getElementById("displayList").innerHTML =
+        "<h5><strong>Hovered County: </strong>" +
+        currData["NAME"] +
+        ", " +
+        currData["STATE_TERR"] +
+        "</h5>";
+    });
     // cursor so that user knows to click
     map.on("mouseenter", "clusters", () => {
       map.getCanvas().style.cursor = "pointer";
