@@ -86,7 +86,7 @@ MapBoxMap.prototype.initVis = function () {
       type: "fill",
       paint: {
         "fill-color": "#EE4B2B",
-        "fill-opacity": 0.3,
+        "fill-opacity": 0.15,
         "fill-outline-color": "white",
       },
     });
