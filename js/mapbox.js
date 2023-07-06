@@ -465,24 +465,24 @@ MapBoxMap.prototype.initVis = function () {
         };
 
         var currYear = parseInt(document.getElementById("timeSlider").value);
-        var newLocData = {
-          ...vis.data[0],
-          features: vis.data[0].features.filter(function (d) {
-            var bool = false;
-            // console.log(d, d["START_DATE"])
-            if (
-              !isNaN(d.properties.firstYear) ||
-              !isNaN(d.properties.lastYear)
-            ) {
-              bool = (d.properties.firstYear <= currYear);
-              // bool =
-              //   d.properties.firstYear >= currYear &&
-              //   d.properties.lastYear <= currYear;
-            }
-            return bool;
-          }),
-        };
-        map.getSource("locations").setData(newLocData);
+        // var newLocData = {
+        //   ...vis.data[0],
+        //   features: vis.data[0].features.filter(function (d) {
+        //     var bool = false;
+        //     // console.log(d, d["START_DATE"])
+        //     if (
+        //       !isNaN(d.properties.firstYear) ||
+        //       !isNaN(d.properties.lastYear)
+        //     ) {
+        //       bool = (d.properties.firstYear <= currYear);
+        //       // bool =
+        //       //   d.properties.firstYear >= currYear &&
+        //       //   d.properties.lastYear <= currYear;
+        //     }
+        //     return bool;
+        //   }),
+        // };
+        // map.getSource("locations").setData(newLocData);
 
         map.getSource("countyBoundaries").setData(newCountyData);
         map.getSource("stateBoundaries").setData(newStateData);
