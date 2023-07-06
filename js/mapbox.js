@@ -324,19 +324,33 @@ MapBoxMap.prototype.initVis = function () {
       document.getElementById("clusterList").innerHTML = "";
       document.getElementById("clickedPanel").setAttribute("display", "none");
       // console.log(currData);
-      popup
-        .setLngLat(e.lngLat)
-        .setHTML(
-          "<div id = 'locPopup'><h5>" +
-            currData.name +
-            ", <br>" +
-            currData.state +
-            ", " +
-            currData.country +
-            "</h5>" +
-            "</div>"
-        )
-        .addTo(map);
+      if (currData.state != undefined) {
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            "<div id = 'locPopup'><h5>" +
+              currData.name +
+              ", <br>" +
+              currData.state +
+              ", " +
+              currData.country +
+              "</h5>" +
+              "</div>"
+          )
+          .addTo(map);
+      } else {
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            "<div id = 'locPopup'><h5>" +
+              currData.name +
+              ", <br>" +
+              currData.country +
+              "</h5>" +
+              "</div>"
+          )
+          .addTo(map);
+      }
 
       if (currData.personnel != undefined) {
         e.features[0].properties.personnel = JSON.parse(
@@ -348,6 +362,9 @@ MapBoxMap.prototype.initVis = function () {
     });
 
     map.on("mousemove", "County Fill", (county) => {
+      document.getElementById("hoverPanel").style.visibility = "visible";
+      document.getElementById("hoverPanel").style.left = county.point.x + "px";
+      document.getElementById("hoverPanel").style.top = county.point.y + "px";
       var currData = county.features[0].properties;
       document.getElementById("countyInfo").innerHTML =
         "<h5><strong>Hovered County: </strong>" +
@@ -358,17 +375,25 @@ MapBoxMap.prototype.initVis = function () {
         "</h5>";
     });
     map.on("mouseleave", "County Fill", () => {
+      document.getElementById("hoverPanel").style.visibility = "hidden";
       document.getElementById("countyInfo").innerHTML = "";
     });
     map.on("mousemove", "State Fill", (state) => {
+      document.getElementById("hoverPanel").style.visibility = "visible";
+      document.getElementById("hoverPanel").style.left = state.point.x + "px";
+      document.getElementById("hoverPanel").style.top = state.point.y + "px";
       var currData = state.features[0].properties;
       document.getElementById("stateInfo").innerHTML =
         "<h5><strong>Hovered State: </strong>" + currData["NAME"] + "</h5>";
     });
     map.on("mouseleave", "State Fill", () => {
+      document.getElementById("hoverPanel").style.visibility = "hidden";
       document.getElementById("stateInfo").innerHTML = "";
     });
     map.on("mousemove", "1798 Tax Divisions", (tax) => {
+      document.getElementById("hoverPanel").style.visibility = "visible";
+      document.getElementById("hoverPanel").style.left = tax.point.x + "px";
+      document.getElementById("hoverPanel").style.top = tax.point.y + "px";
       var currData = tax.features[0].properties;
       document.getElementById("taxInfo").innerHTML =
         "<h5><strong>Hovered 1798 Tax Division: </strong>" +
@@ -378,9 +403,14 @@ MapBoxMap.prototype.initVis = function () {
         "</h5>";
     });
     map.on("mouseleave", "1798 Tax Divisions", () => {
+      document.getElementById("hoverPanel").style.visibility = "hidden";
       document.getElementById("taxInfo").innerHTML = "";
     });
     map.on("mousemove", "1814 District", (district) => {
+      document.getElementById("hoverPanel").style.visibility = "visible";
+      document.getElementById("hoverPanel").style.left =
+        district.point.x + "px";
+      document.getElementById("hoverPanel").style.top = district.point.y + "px";
       var currData = district.features[0].properties;
       document.getElementById("districtInfo").innerHTML =
         "<h5><strong>Hovered 1814 District: </strong>" +
@@ -390,6 +420,7 @@ MapBoxMap.prototype.initVis = function () {
         "</h5>";
     });
     map.on("mouseleave", "1814 District", () => {
+      document.getElementById("hoverPanel").style.visibility = "hidden";
       document.getElementById("districtInfo").innerHTML = "";
     });
     map.on("mouseenter", "clusters", () => {
@@ -405,6 +436,7 @@ MapBoxMap.prototype.initVis = function () {
         document.getElementById("yearLabel").innerHTML =
           "<strong>Current Year: </strong>" + e.target.value;
       });
+
     document
       .getElementById("timeSlider")
       .addEventListener("change", function (e) {
@@ -431,67 +463,65 @@ MapBoxMap.prototype.initVis = function () {
             return bool;
           }), // Filter the array based on a condition
         };
-        console.log(document.getElementById("locYearSwitch").value);
-        if (document.getElementById("locYearSwitch").value) {
-          var currYear = document.getElementById("timeSlider").value;
-          var newLocData = {
-            ...vis.data[0],
-            features: vis.data[0].features.filter(function (d) {
-              var bool = false;
-              console.log(d);
 
-              // console.log(d, d["START_DATE"])
-              if (
-                !isNaN(d.properties.firstYear) ||
-                !isNaN(d.properties.lastYear)
-              ) {
-                bool =
-                  d.properties.firstYear >= currYear &&
-                  d.properties.lastYear <= currYear;
-              }
-              return bool;
-            }),
-          };
-          map.getSource("locations").setData(newLocData);
-        } else {
-          map.getSource("locations").setData(vis.data[0]);
-        }
+        var currYear = parseInt(document.getElementById("timeSlider").value);
+        var newLocData = {
+          ...vis.data[0],
+          features: vis.data[0].features.filter(function (d) {
+            var bool = false;
+            // console.log(d, d["START_DATE"])
+            if (
+              !isNaN(d.properties.firstYear) ||
+              !isNaN(d.properties.lastYear)
+            ) {
+              bool = (d.properties.firstYear <= currYear);
+              // bool =
+              //   d.properties.firstYear >= currYear &&
+              //   d.properties.lastYear <= currYear;
+            }
+            return bool;
+          }),
+        };
+        map.getSource("locations").setData(newLocData);
 
         map.getSource("countyBoundaries").setData(newCountyData);
         map.getSource("stateBoundaries").setData(newStateData);
       });
-    document
-      .getElementById("locYearSwitch")
-      .addEventListener("input", function (switchValue) {
-        console.log(switchValue);
-        if (document.getElementById("locYearSwitch").value) {
-          var currYear = document.getElementById("timeSlider").value;
-          var newLocData = {
-            ...vis.data[0],
-            features: vis.data[0].features.filter(function (d) {
-              var bool = false;
-              console.log(d);
+    // document
+    //   .getElementById("locYearButton")
+    //   .addEventListener("click", function (switchValue) {
+    //     console.log(switchValue);
+    //     switchValue = switchValue.target.value;
+    //     console.log(switchValue);
 
-              // console.log(d, d["START_DATE"])
-              if (
-                !isNaN(d.properties.firstYear) ||
-                !isNaN(d.properties.lastYear)
-              ) {
-                bool =
-                  d.properties.firstYear >= currYear &&
-                  d.properties.lastYear <= currYear;
-              }
-              return bool;
-            }),
-          };
-          map.getSource("locations").setData(newLocData);
-          document.getElementById("locYearSwitch").value = false;
-        } else {
-          map.getSource("locations").setData(vis.data[0]);
-          document.getElementById("locYearSwitch").value = true;
-        }
-      });
+    //     if (switchValue) {
+    //       var currYear = document.getElementById("timeSlider").value;
+    //       var newLocData = {
+    //         ...vis.data[0],
+    //         features: vis.data[0].features.filter(function (d) {
+    //           var bool = false;
+    //           // console.log(d);
 
+    //           // console.log(d, d["START_DATE"])
+    //           if (
+    //             !isNaN(d.properties.firstYear) ||
+    //             !isNaN(d.properties.lastYear)
+    //           ) {
+    //             bool =
+    //               d.properties.firstYear >= currYear &&
+    //               d.properties.lastYear <= currYear;
+    //           }
+    //           return bool;
+    //         }),
+    //       };
+    //       map.getSource("locations").setData(newLocData);
+    //       document.getElementById("locYearButton").target.value = false;
+    //     } else {
+    //       map.getSource("locations").setData(vis.data[0]);
+    //       document.getElementById("locYearButton").target.value = true;
+    //     }
+    //     console.log(switchValue, document.getElementById("timeSlider").value);
+    //   });
     console.log(vis.data);
     // CLOSE OF MAPLOAD
   });

@@ -48,6 +48,19 @@ body {
 }
 #districtInfo {
 }
+#hoverPanel{
+  font-family: "Roboto";
+  background-color: #fff;
+  margin: 25px;
+  border: 2px solid black;
+  color: #222;
+  background-color: #fff;
+  border-radius: 3px;
+  padding: 5px;
+  position: absolute;
+  width: auto;
+  visibility: hidden;
+}
 
 #toggleMenu {
   margin: 40px;
