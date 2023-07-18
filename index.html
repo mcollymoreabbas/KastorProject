@@ -56,32 +56,38 @@
     <div id="mapbox-map"></div>
     <div id="infoContainer">
       <h5>
-        <label for="timeSlider">Time Slider: 1789 - 1832</label>
-        <input
-          type="range"
-          min="1789"
-          max="1832"
-          value="1832"
-          class="slider"
-          id="timeSlider"
-        />
+        <!-- <label for="timeSlider">Time Slider: 1789 - 1832</label> -->
+        <span id="timeSliderSpan">
+          <h5>1789</h5>
+          <input
+            type="range"
+            min="1789"
+            max="1832"
+            value="1832"
+            class="slider"
+            id="timeSlider"
+          />
+          <h5>1832</h5>
+        </span>
         <h5 id="yearLabel"><strong>Current Year:</strong> 1832</h5>
       </h5>
       <div id="clickedPanel">
-        <div id="clusterList"></div>
+        <div id="locInfo"></div>
+        <ul id = "personnelInfo"></ul>
+
       </div>
     </div>
+    <!-- find a label for the toggle menu <a>Toggle Map Layers</a> -->
     <div id="toggleMenu"></div>
     <!-- <button id="locYearButton" value="false" type="submit">
       Toggle Locations
     </button> -->
-    <div id="hoverPanel">
-      <div id="countyInfo"></div>
-      <div id="stateInfo"></div>
-      <div id="countryInfo"></div>
-      <div id="taxInfo"></div>
-      <div id="districtInfo"></div>
-      <div id="locInfo"></div>
+
+    <div id="settingsPanel">
+      <input type="checkbox" id="locationToggle" />
+      <input type="checkbox" id="" />
+      <label for="locationToggle">Show All Locations</label>
+      <button id="updateMapButton" type="submit">Update Map Features</button>
     </div>
 
     <!-- <img src="./data/LoadingGif.gif" id="loadingImg" /> -->

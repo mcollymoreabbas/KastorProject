@@ -98,16 +98,17 @@ function loadData() {
       locationGeoJSON = { type: "FeatureCollection", features: temp };
       // issue with the personnel popping up right now
       // filter and merge all the personnel to one object right now
+      var personnelArr = [];
       locationGeoJSON.features.forEach(function (loc) {
         var temp = peopleData.filter(function (p) {
           return p["Geocoding ID"] == loc.properties.geoID;
         });
         if (temp.length > 0) {
           var personnelArr = [
-            {
-              employeeID: temp[0]["GovernmentEmployeeNumber"],
-              appointments: temp,
-            },
+            // {
+            //   employeeID: temp[0]["GovernmentEmployeeNumber"],
+            //   appointments: temp,
+            // },
           ];
           var smallestYear = temp.reduce((smallest, obj) => {
             return obj["Record Year"] < smallest
@@ -119,7 +120,7 @@ function loadData() {
           }, -Infinity);
           loc.properties.firstYear = smallestYear;
           loc.properties.lastYear = biggestYear;
-          loc.properties.personnel = personnelArr;
+          loc.properties.personnel = temp;
           // if(loc.properties.state == "NY"){
           //   console.log(loc)
           // }

@@ -1,7 +1,9 @@
 body {
   font-family: "Roboto";
 }
-
+a{
+    font-family: "Roboto";
+}
 #mapbox-map,
 #infoContainer {
   margin: 25px;
@@ -38,15 +40,21 @@ body {
 #locInfo {
   overflow-y: auto;
 }
-#countyInfo {
+#timeSliderSpan{
+  display: inline-block;
 }
-#stateInfo {
-}
-#countryInfo {
-}
-#taxInfo {
-}
-#districtInfo {
+#settingsPanel{
+  margin: 40px;
+  border: 2px solid black;
+  background: #fff;
+  position: absolute;
+  z-index: 1;
+  top: 300px;
+  right: 10px;
+  border-radius: 3px;
+  width: 120px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  font-family: "Roboto", sans-serif;
 }
 #hoverPanel{
   font-family: "Roboto";
@@ -73,7 +81,7 @@ body {
   border-radius: 3px;
   width: 120px;
   border: 1px solid rgba(0, 0, 0, 0.4);
-  font-family: "Open Sans", sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 #toggleMenu a {
