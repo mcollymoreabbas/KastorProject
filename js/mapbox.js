@@ -6,32 +6,28 @@ MapBoxMap = function (_parentElement, _data) {
   // data [1] is countyBoundariesgeoJSON
   //data [2] is stateBoundariesgeoJSON
   //data[3] is taxes
-  //data[4] is 1814 district
+  //data[4] is 1814 Tax Districts
 };
 
 MapBoxMap.prototype.initVis = function () {
   var vis = this;
 
-  const popup = new mapboxgl.Popup({ closeOnClick: true });
+  const popup = new mapboxgl.Popup({ closeOnClick: true, maxWidth: "150px" });
   // , offset: popupOffsets
 
   mapboxgl.accessToken =
     "pk.eyJ1Ijoia2FzdG9ycHJvamVjdCIsImEiOiJjbGlkZ2Q0Z3Ywc2N5M2RwZjVrcnJhMmNvIn0.e1tZnLbd-wfMVODWHJH4ew";
   const map = new mapboxgl.Map({
     container: vis.parentElement, // container ID
-    style: "mapbox://styles/mapbox/light-v11", // style URL
-    center: [-75.5, 43], // starting position [lng, lat]
-    zoom: 6, // starting zoom
+    style: "mapbox://styles/kastorproject/clk8k4knw033a01ns024f3h44", // bubble URL
+    center: [-82, 35], // starting position [lng, lat]
+    zoom: 4, // starting zoom
   });
 
   //     style: "mapbox://styles/kastorproject/clk8k8t5j032r01qv0x5sah8o", // minimo URL
-
   //     style: "mapbox://styles/kastorproject/clk8k78xh031b01qj2ccc8gkn", // cali terrain URL
-
   //     style: "mapbox://styles/kastorproject/clk8k4knw033a01ns024f3h44", // bubble URL
-
   //     style: "mapbox://styles/mapbox/satellite-v9", // style URL
-
   //     style: "mapbox://styles/mapbox/light-v11", // style URL
 
   // initial load of the map
@@ -42,7 +38,7 @@ MapBoxMap.prototype.initVis = function () {
       features: vis.data[1].features.filter(function (d) {
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
-        var currDate = new Date("1832-12-31");
+        var currDate = new Date("1811-12-31");
         var bool = sDate < currDate && eDate >= currDate;
         return bool;
       }), // Filter the array based on a condition
@@ -52,10 +48,25 @@ MapBoxMap.prototype.initVis = function () {
       features: vis.data[2].features.filter(function (d) {
         var sDate = new Date(d.properties["START_DATE"]);
         var eDate = new Date(d.properties["END_DATE"]);
-        var currDate = new Date("1832-12-31");
+        var currDate = new Date("1811-12-31");
         var bool = sDate < currDate && eDate >= currDate;
         return bool;
       }), // Filter the array based on a condition
+    };
+    var originalLocData = {
+      ...vis.data[0],
+      features: vis.data[0].features.filter(function (d) {
+        var bool = false;
+        if (
+          !isNaN(d.properties["Earliest Record"]) ||
+          !isNaN(d.properties["Latest Record"])
+        ) {
+          bool =
+            d.properties["Earliest Record"] <= 1811 &&
+            d.properties["Latest Record"] >= 1811;
+        }
+        return bool;
+      }),
     };
     // BOUNDARY SOURCE DATA
     map.addSource("countyBoundaries", {
@@ -71,7 +82,7 @@ MapBoxMap.prototype.initVis = function () {
     // LOCATION SOURCE DATA
     map.addSource("locations", {
       type: "geojson",
-      data: vis.data[0],
+      data: originalLocData,
       generateId: true,
       cluster: true,
       // clusterMaxZoom: 7,
@@ -80,7 +91,7 @@ MapBoxMap.prototype.initVis = function () {
     // LOCATIONS NO CLUSTER
     map.addSource("allLocations", {
       type: "geojson",
-      data: vis.data[0],
+      data: originalLocData,
       generateId: true,
     });
     //TAX SOURCE DATA
@@ -89,11 +100,65 @@ MapBoxMap.prototype.initVis = function () {
       data: vis.data[3],
       generateId: true,
     });
-    //1814 DISTRICT DATA
+    //1814 Tax Districts DATA
     map.addSource("district", {
       type: "geojson",
       data: vis.data[4],
       generateId: true,
+    });
+    // TAX OUTLINE LAYER
+    map.addLayer({
+      id: "Tax Outlines",
+      source: "taxes",
+      type: "line",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+        visibility: "none",
+      },
+      paint: {
+        "line-color": "blue",
+        "line-width": 2,
+      },
+    });
+    // TAX FILL LAYER
+    map.addLayer({
+      id: "1798 Tax Districts",
+      source: "taxes",
+      type: "fill",
+      layout: { visibility: "none" },
+      paint: {
+        "fill-color": "#EE4B2B",
+        "fill-opacity": 0,
+        "fill-outline-color": "white",
+      },
+    });
+    // DISTRICT OUTLINE LAYER
+    map.addLayer({
+      id: "District Outlines",
+      source: "district",
+      type: "line",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+        visibility: "none",
+      },
+      paint: {
+        "line-color": "red",
+        "line-width": 2,
+      },
+    });
+    // DISTRICT FILL LAYER
+    map.addLayer({
+      id: "1814 Tax Districts",
+      source: "district",
+      type: "fill",
+      layout: { visibility: "none" },
+      paint: {
+        "fill-color": "#EE4B2B",
+        "fill-opacity": 0,
+        "fill-outline-color": "white",
+      },
     });
     // COUNTY OUTLINE LAYER
     map.addLayer({
@@ -134,26 +199,8 @@ MapBoxMap.prototype.initVis = function () {
       },
       // interpolation numbers need work
       paint: {
-        "line-color": [
-          "interpolate",
-          ["linear"],
-          ["get", "ID_NUM"],
-          0,
-          "#FF0000",
-          20,
-          "#FFFF00",
-          50,
-          "#A020F0",
-          80,
-          "#00FF00",
-          110,
-          "#FFA500",
-          150,
-          "#FFC0CB",
-          180,
-          "#808080",
-        ],
-        "line-width": 6,
+        "line-color": "black",
+        "line-width": 3.5,
       },
     });
     // STATE FILL LAYER
@@ -168,61 +215,6 @@ MapBoxMap.prototype.initVis = function () {
         "fill-outline-color": "white",
       },
     });
-    // TAX OUTLINE LAYER
-    map.addLayer({
-      id: "Tax Outlines",
-      source: "taxes",
-      type: "line",
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-        visibility: "none",
-      },
-      paint: {
-        "line-color": "blue",
-        "line-width": 2,
-      },
-    });
-    // TAX FILL LAYER
-    map.addLayer({
-      id: "1798 Tax Divisions",
-      source: "taxes",
-      type: "fill",
-      layout: { visibility: "none" },
-      paint: {
-        "fill-color": "#EE4B2B",
-        "fill-opacity": 0,
-        "fill-outline-color": "white",
-      },
-    });
-    // DISTRICT OUTLINE LAYER
-    map.addLayer({
-      id: "District Outlines",
-      source: "district",
-      type: "line",
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-        visibility: "none",
-      },
-      paint: {
-        "line-color": "red",
-        "line-width": 2,
-      },
-    });
-    // DISTRICT FILL LAYER
-    map.addLayer({
-      id: "1814 District",
-      source: "district",
-      type: "fill",
-      layout: { visibility: "none" },
-      paint: {
-        "fill-color": "#EE4B2B",
-        "fill-opacity": 0,
-        "fill-outline-color": "white",
-      },
-    });
-
     // zoomed out clusters
     map.addLayer({
       id: "clusters",
@@ -252,6 +244,9 @@ MapBoxMap.prototype.initVis = function () {
           "#000000",
         ],
       },
+      layout: {
+        visibility: "none",
+      },
     });
     // cluster count label
     map.addLayer({
@@ -263,6 +258,7 @@ MapBoxMap.prototype.initVis = function () {
         "text-field": ["get", "point_count_abbreviated"],
         "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
         "text-size": 12,
+        visibility: "none",
       },
     });
     // individual location points
@@ -277,8 +273,10 @@ MapBoxMap.prototype.initVis = function () {
         "circle-stroke-width": 2,
         "circle-stroke-color": "#000000",
       },
+      layout: {
+        visibility: "none",
+      },
     });
-
     map.addLayer({
       id: "allPoints",
       type: "circle",
@@ -289,64 +287,10 @@ MapBoxMap.prototype.initVis = function () {
         "circle-stroke-width": 2,
         "circle-stroke-color": "#000000",
       },
-      layout: {
-        visibility: "none",
-      },
     });
-    map.on("mousemove", ["unclustered-point", "allPoints"], (e) => {
-      var currData = e.features[0].properties;
-      document.getElementById("clickedPanel").setAttribute("display", "none");
-      if (currData.state != undefined) {
-        popup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            "<div id = 'locPopup'><h5>" +
-              currData.name +
-              ", <br>" +
-              currData.state +
-              ", " +
-              currData.country +
-              "</h5>" +
-              "</div>"
-          )
-          .addTo(map);
-      } else {
-        popup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            "<div id = 'locPopup'><h5>" +
-              currData.name +
-              ", <br>" +
-              currData.country +
-              "</h5>" +
-              "</div>"
-          )
-          .addTo(map);
-      }
-    });
-    map.on("click", ["unclustered-point", "allPoints"], (e) => {
-      console.log(e);
-      var clickedPoint = map.queryRenderedFeatures(e.point, {
-        layers: ["unclustered-point", "allPoints"],
-      });
-      console.log(clickedPoint);
-      document.getElementById("locInfo").innerHTML =
-        "Clicked Location: " + clickedPoint[0].properties.name;
-      if (clickedPoint[0].properties.personnel != undefined) {
-        clickedPoint[0].properties.personnel = JSON.parse(
-          clickedPoint[0].properties.personnel
-        );
-        var personnelString = "";
 
-        clickedPoint[0].properties.personnel.forEach(function (p) {
-          console.log(p);
-          personnelString = personnelString + "<li>" + p["Full Name"] + "</li>";
-        });
-        document.getElementById("personnelInfo").innerHTML = personnelString;
-      }
-    });
     map.on("zoom", () => {
-      if (map.getZoom() < 4) {
+      if (map.getZoom() < 5.5) {
         map.setLayoutProperty("clusters", "visibility", "none");
         map.setLayoutProperty("cluster-count", "visibility", "none");
         map.setLayoutProperty("unclustered-point", "visibility", "none");
@@ -368,10 +312,8 @@ MapBoxMap.prototype.initVis = function () {
     document
       .getElementById("timeSlider")
       .addEventListener("input", function (e) {
-        document.getElementById("yearLabel").innerHTML =
-          "<strong>Current Year: </strong>" + e.target.value;
+        document.getElementById("slider-value").innerHTML = e.target.value;
       });
-
     document
       .getElementById("timeSlider")
       .addEventListener("change", function (e) {
@@ -396,26 +338,52 @@ MapBoxMap.prototype.initVis = function () {
             return bool;
           }),
         };
+        var currYear = parseInt(e.target.value);
+        var newLocData = {
+          ...vis.data[0],
+          features: vis.data[0].features.filter(function (d) {
+            var bool = false;
+            if (
+              !isNaN(d.properties["Earliest Record"]) ||
+              !isNaN(d.properties["Latest Record"])
+            ) {
+              bool =
+                d.properties["Earliest Record"] <= currYear &&
+                d.properties["Latest Record"] >= currYear;
+            }
+            return bool;
+          }),
+        };
+        vis.map.getSource("locations").setData(newLocData);
+        vis.map.getSource("allLocations").setData(newLocData);
         vis.map.getSource("countyBoundaries").setData(newCountyData);
         vis.map.getSource("stateBoundaries").setData(newStateData);
       });
 
     var locID = null;
-
+    // hover functions
     map.on(
       "mousemove",
       [
         "County Fill",
-        "1798 Tax Divisions",
+        "1798 Tax Districts",
         "State Fill",
-        "1814 District",
+        "1814 Tax Districts",
         "State Boundaries",
         "County Boundaries",
         "District Outlines",
         "Tax Outlines",
         "clusters",
+        "unclustered-point",
+        "allPoints",
       ],
       (e) => {
+        var allLayer = map.queryRenderedFeatures(e.point, {
+          layers: ["allPoints"],
+        });
+        var unclusterLayer = map.queryRenderedFeatures(e.point, {
+          layers: ["unclustered-point"],
+        });
         var clusterLayer = map.queryRenderedFeatures(e.point, {
           layers: ["clusters"],
         });
@@ -426,15 +394,15 @@ MapBoxMap.prototype.initVis = function () {
           layers: ["County Fill"],
         });
         var taxLayer = map.queryRenderedFeatures(e.point, {
-          layers: ["1798 Tax Divisions"],
+          layers: ["1798 Tax Districts"],
         });
         var districtLayer = map.queryRenderedFeatures(e.point, {
-          layers: ["1814 District"],
+          layers: ["1814 Tax Districts"],
         });
         if (clusterLayer.length > 0) {
-          const clusterId = clusterLayer[0].properties.cluster_id;
-          const pointCount = clusterLayer[0].properties.point_count;
-          const clusterSource = map.getSource("locations");
+          var clusterId = clusterLayer[0].properties.cluster_id;
+          var pointCount = clusterLayer[0].properties.point_count;
+          var clusterSource = map.getSource("locations");
           if (pointCount) {
             clusterSource.getClusterLeaves(
               clusterId,
@@ -446,7 +414,9 @@ MapBoxMap.prototype.initVis = function () {
                 if (features) {
                   features.forEach(function (point) {
                     clusterString =
-                      clusterString + point.properties["name"] + " | ";
+                      clusterString +
+                      point.properties["Geocoding Location"] +
+                      " | ";
                   });
                 }
                 clusterString = clusterString + "</strong></a";
@@ -475,6 +445,17 @@ MapBoxMap.prototype.initVis = function () {
               // hovered: true,
             }
           );
+        } else if (allLayer.length > 0 || unclusterLayer.length > 0) {
+          var currData = e.features[0].properties;
+          var pointString =
+            "<div id = 'locPopup'><h5>" +
+            currData["Geocoding Location"] +
+            ", <br>";
+          if (currData["State"] !== "") {
+            pointString = pointString + currData["State"] + ", ";
+          }
+          pointString = pointString + currData["Country"] + "</h5>" + "</div>";
+          popup.setLngLat(e.lngLat).setHTML(pointString).addTo(map);
         } else if (
           stateLayer.length > 0 ||
           countyLayer.length > 0 ||
@@ -486,37 +467,40 @@ MapBoxMap.prototype.initVis = function () {
             var currData = countyLayer[0].properties;
             hoverString =
               hoverString +
-              "<h5>County: </h5> <a>" +
+              "<strong>County: </strong> <a>" +
               currData["NAME"].charAt(0) +
               currData["NAME"].slice(1).toLowerCase() +
               ", " +
               currData["STATE_TERR"] +
-              "</a>";
+              "</a><br>";
           }
           if (stateLayer.length > 0) {
             var currData = stateLayer[0].properties;
             hoverString =
-              hoverString + "<h5>State: </h5><a>" + currData["NAME"] + "</a>";
+              hoverString +
+              "<strong>State: </strong><a>" +
+              currData["NAME"] +
+              "</a><br>";
           }
           if (taxLayer.length > 0) {
             var currData = taxLayer[0].properties;
             hoverString =
               hoverString +
-              "<h5>Tax Div.: </h5><a>" +
+              "<strong>1798 Tax: </strong><a>" +
               currData["TaxDivision1798"] +
               ", " +
               currData["State"] +
-              "</a>";
+              "</a><br>";
           }
           if (districtLayer.length > 0) {
             var currData = districtLayer[0].properties;
             hoverString =
               hoverString +
-              "<h5>1814 Dist.: </h5><a>" +
+              "<strong>1814 Tax: </strong><a>" +
               currData["District1814"] +
               ", " +
               currData["State"] +
-              "</a>";
+              "</a><br>";
           }
 
           popup
@@ -527,14 +511,13 @@ MapBoxMap.prototype.initVis = function () {
         }
       }
     );
-
     map.on(
       "mouseout",
       [
         "County Fill",
-        "1798 Tax Divisions",
+        "1798 Tax Districts",
         "State Fill",
-        "1814 District",
+        "1814 Tax Districts",
         "State Boundaries",
         "County Boundaries",
         "District Outlines",
@@ -547,11 +530,8 @@ MapBoxMap.prototype.initVis = function () {
         popup.remove();
       }
     );
-    // map.on("mouseout", "clusters", () => {
-    //   popup.remove();
-    // });
+    // click functions
     map.on("click", "clusters", (e) => {
-      console.log(e);
       var clickedPoint = map.queryRenderedFeatures(e.point, {
         layers: ["clusters"],
       });
@@ -567,54 +547,67 @@ MapBoxMap.prototype.initVis = function () {
         });
       }
     });
-    // document
-    //   .getElementById("locYearButton")
-    //   .addEventListener("click", function (switchValue) {
-    //     console.log(switchValue);
-    //     switchValue = switchValue.target.value;
-    //     console.log(switchValue);
-
-    //     if (switchValue) {
-    //       var currYear = document.getElementById("timeSlider").value;
-    //       var newLocData = {
-    //         ...vis.data[0],
-    //         features: vis.data[0].features.filter(function (d) {
-    //           var bool = false;
-    //           // console.log(d);
-
-    //           // console.log(d, d["START_DATE"])
-    //           if (
-    //             !isNaN(d.properties.firstYear) ||
-    //             !isNaN(d.properties.lastYear)
-    //           ) {
-    //             bool =
-    //               d.properties.firstYear >= currYear &&
-    //               d.properties.lastYear <= currYear;
-    //           }
-    //           return bool;
-    //         }),
-    //       };
-    //       map.getSource("locations").setData(newLocData);
-    //       document.getElementById("locYearButton").target.value = false;
-    //     } else {
-    //       map.getSource("locations").setData(vis.data[0]);
-    //       document.getElementById("locYearButton").target.value = true;
-    //     }
-    //     console.log(switchValue, document.getElementById("timeSlider").value);
-    //   });
+    map.on("click", ["unclustered-point", "allPoints"], (e) => {
+      var clickedString = "";
+      var clickedPoint = map.queryRenderedFeatures(e.point, {
+        layers: ["unclustered-point", "allPoints"],
+      });
+      var currData = clickedPoint[0].properties;
+      clickedString =
+        clickedString +
+        "<br> <strong><h5>" +
+        currData["Geocoding Location"] +
+        "</h5></strong>";
+      if (currData["State"] != "") {
+        clickedString = clickedString + "<a>" + currData["State"] + ", ";
+      }
+      clickedString =
+        clickedString +
+        currData["Country"] +
+        ", " +
+        currData["Sector"] +
+        "</a><br>";
+      clickedString =
+        clickedString +
+        "<a><strong> Earliest Employee Record: </strong>" +
+        currData["Earliest Record"] +
+        "<br> <strong> Latest Employee Record: </strong>" +
+        currData["Latest Record"];
+      if (Object.keys(currData.personnel).length > 0) {
+        currData.personnel = JSON.parse(currData.personnel);
+        console.log(currData);
+        Object.entries(currData.personnel).forEach(([key, value]) => {
+          var link = document.createElement("a");
+          link.id = key;
+          console.log(value);
+          link.textContent = value[0]["Full Name"];
+          link.className = "";
+          link.href = "#";
+          link.onclick = function(e){
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          document.getElementById("personnelInfo").appendChild(link);
+        });
+      } else {
+        document.getElementById("personnelInfo").innerHTML = "";
+      }
+      document.getElementById("locInfo").innerHTML = clickedString;
+    });
   });
   // CLOSE OF MAPLOAD
   console.log(vis.data);
-  // document
-  //   .getElementById("updateMapButton")
-  //   .addEventListener("click", vis.updateMap());
   map.on("idle", () => {
+    setTimeout(function () {
+      document.querySelector("#loadingLogo").style.display = "none";
+      document.querySelector("body").style.visibility = "visible";
+    }, 3000);
     // If these two layers were not added to the map, abort
     if (
       !map.getLayer("State Boundaries") ||
       !map.getLayer("County Boundaries") ||
-      !map.getLayer("1814 District") ||
-      !map.getLayer("1798 Tax Divisions") ||
+      !map.getLayer("1814 Tax Districts") ||
+      !map.getLayer("1798 Tax Districts") ||
       !map.getLayer("State Fill") ||
       !map.getLayer("County Fill")
     ) {
@@ -624,8 +617,8 @@ MapBoxMap.prototype.initVis = function () {
     const toggleableLayerIds = [
       "State Boundaries",
       "County Boundaries",
-      "1814 District",
-      "1798 Tax Divisions",
+      "1814 Tax Districts",
+      "1798 Tax Districts",
     ];
     // Set up the corresponding toggle button for each layer.
     for (const id of toggleableLayerIds) {
@@ -667,7 +660,7 @@ MapBoxMap.prototype.initVis = function () {
           } else {
             map.setLayoutProperty("County Fill", "visibility", "visible");
           }
-        } else if (clickedLayer == "1798 Tax Divisions") {
+        } else if (clickedLayer == "1798 Tax Districts") {
           if (
             map.getLayoutProperty("Tax Outlines", "visibility") === "visible"
           ) {
@@ -675,7 +668,7 @@ MapBoxMap.prototype.initVis = function () {
           } else {
             map.setLayoutProperty("Tax Outlines", "visibility", "visible");
           }
-        } else if (clickedLayer == "1814 District") {
+        } else if (clickedLayer == "1814 Tax Districts") {
           if (
             map.getLayoutProperty("District Outlines", "visibility") ===
             "visible"
@@ -692,27 +685,4 @@ MapBoxMap.prototype.initVis = function () {
   });
   // end of map idle
   vis.map = map;
-};
-
-MapBoxMap.prototype.updateMap = function () {
-  var vis = this;
-  console.log(vis.map);
-  if (!document.getElementById("locationToggle").checked) {
-    vis.map.getSource("locations").setData(vis.data[0]);
-  } else {
-    var currYear = parseInt(document.getElementById("timeSlider").value);
-    var newLocData = {
-      ...vis.data[0],
-      features: vis.data[0].features.filter(function (d) {
-        var bool = false;
-        if (!isNaN(d.properties.firstYear) || !isNaN(d.properties.lastYear)) {
-          bool = d.properties.firstYear <= currYear;
-        } else {
-          bool = true;
-        }
-        return bool;
-      }),
-    };
-    vis.map.getSource("locations").setData(newLocData);
-  }
 };
