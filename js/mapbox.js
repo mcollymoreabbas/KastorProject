@@ -573,13 +573,12 @@ MapBoxMap.prototype.initVis = function () {
         currData["Earliest Record"] +
         "<br> <strong> Latest Employee Record: </strong>" +
         currData["Latest Record"];
-      if (Object.keys(currData.personnel).length > 0) {
+      if (Object.keys(currData["personnel"]).length > 2) {
+        document.getElementById("personnelInfo").innerHTML = "";
         currData.personnel = JSON.parse(currData.personnel);
-        console.log(currData);
         Object.entries(currData.personnel).forEach(([key, value]) => {
           var link = document.createElement("a");
           link.id = key;
-          console.log(value);
           link.textContent = value[0]["Full Name"];
           link.className = "";
           link.href = "#";
@@ -589,7 +588,9 @@ MapBoxMap.prototype.initVis = function () {
           }
           document.getElementById("personnelInfo").appendChild(link);
         });
+        document.querySelector("#personnelInfo").style.visibility = "visible";
       } else {
+        document.querySelector("#personnelInfo").style.visibility = "hidden";
         document.getElementById("personnelInfo").innerHTML = "";
       }
       document.getElementById("locInfo").innerHTML = clickedString;

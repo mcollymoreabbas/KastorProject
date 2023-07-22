@@ -10,6 +10,7 @@ function loadData() {
 
   // document.querySelector("body").style.visibility = "hidden";
   document.querySelector("#loadingLogo").style.visibility = "visible";
+  document.querySelector("#personnelInfo").style.visibility = "hidden";
 
 
   var locationUrl = "./data/AllLocations.json";
