@@ -24,12 +24,6 @@ MapBoxMap.prototype.initVis = function () {
     zoom: 4, // starting zoom
   });
 
-  //     style: "mapbox://styles/kastorproject/clk8k8t5j032r01qv0x5sah8o", // minimo URL
-  //     style: "mapbox://styles/kastorproject/clk8k78xh031b01qj2ccc8gkn", // cali terrain URL
-  //     style: "mapbox://styles/kastorproject/clk8k4knw033a01ns024f3h44", // bubble URL
-  //     style: "mapbox://styles/mapbox/satellite-v9", // style URL
-  //     style: "mapbox://styles/mapbox/light-v11", // style URL
-
   // initial load of the map
   map.on("load", () => {
     // county data
@@ -573,6 +567,7 @@ MapBoxMap.prototype.initVis = function () {
         currData["Earliest Record"] +
         "<br> <strong> Latest Employee Record: </strong>" +
         currData["Latest Record"];
+        console.log(currData);
       if (Object.keys(currData["personnel"]).length > 2) {
         document.getElementById("personnelInfo").innerHTML = "";
         currData.personnel = JSON.parse(currData.personnel);

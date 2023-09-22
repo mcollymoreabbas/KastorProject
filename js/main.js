@@ -1,14 +1,9 @@
 var allData = [];
 
-// Variable for the visualization instance
 var leafletMap, mapboxMap;
-// Start application by loading the data
 loadData();
-// organize the data load at the VERY END
 function loadData() {
-  // Hubway XML station feed
 
-  // document.querySelector("body").style.visibility = "hidden";
   document.querySelector("#loadingLogo").style.visibility = "visible";
   document.querySelector("#personnelInfo").style.visibility = "hidden";
 
@@ -67,8 +62,7 @@ function loadData() {
         return a.GovernmentEmployeeNumber - b.GovernmentEmployeeNumber;
       });
 
-      // issue with the personnel popping up right now
-      // filter and merge all the personnel to one object right now
+
       lData.features.forEach(function (loc) {
         console.lo
         var tempX = loc.geometry.coordinates[0];
